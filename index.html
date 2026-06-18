@@ -1007,7 +1007,7 @@ body {
                         <li class="flex gap-3 mod-topic"><i data-lucide="check" class="w-5 h-5 primary-color shrink-0 mt-0.5"></i><span data-k="m2-t2">Minutas, despachos e documentos</span></li>
                         <li class="flex gap-3 mod-topic"><i data-lucide="check" class="w-5 h-5 primary-color shrink-0 mt-0.5"></i><span data-k="m2-t3">Pesquisa de jurisprudência e síntese de peças</span></li>
                         <li class="flex gap-3 mod-topic"><i data-lucide="check" class="w-5 h-5 primary-color shrink-0 mt-0.5"></i><span data-k="m2-t4">Relatórios gerenciais a partir de dados</span></li>
-                        <li class="flex gap-3 mod-topic"><i data-lucide="check" class="w-5 h-5 primary-color shrink-0 mt-0.5"></i><span data-k="m2-t5">Automação de rotinas repetitivas</span></li>
+                        <li class="flex gap-3 mod-topic"><i data-lucide="check" class="w-5 h-5 primary-color shrink-0 mt-0.5"></i><span data-k="m2-t5">Modelos reutilizáveis e trabalho em lote</span></li>
                     </ul>
                     <div class="grid grid-cols-2 gap-2 mt-4">
                         <div class="attribute-pill text-center p-2 rounded-xl"><i data-lucide="clock" class="w-4 h-4 primary-color mx-auto mb-1"></i><p class="text-xs font-semibold" data-k="m2-carga">10 horas</p></div>
@@ -2448,7 +2448,7 @@ body {
                 .attr('fill', 'rgba(255,144,77,0.12)').attr('stroke', PRIMARY).attr('stroke-width', 2.5).attr('opacity', 0)
                 .transition().duration(500).ease(d3.easeBackOut).attr('opacity', 1);
             const ring = cg.append('circle').attr('r', 34).attr('fill', 'none').attr('stroke', PRIMARY).attr('stroke-width', 3).attr('stroke-dasharray', '8 8').attr('opacity', 0.8);
-            cg.append('text').attr('text-anchor', 'middle').attr('dy', 5).attr('fill', PRIMARY).attr('font-size', 13).attr('font-weight', 800).text('auto');
+            cg.append('text').attr('text-anchor', 'middle').attr('dy', 5).attr('fill', PRIMARY).attr('font-size', 13).attr('font-weight', 800).text('lote');
             svg.append('text').attr('x', inX).attr('y', cy - 70).attr('text-anchor', 'middle').attr('fill', 'rgba(255,255,255,0.5)').attr('font-size', 13).text('tarefas');
             svg.append('text').attr('x', outX).attr('y', cy - 70).attr('text-anchor', 'middle').attr('fill', 'rgba(255,255,255,0.5)').attr('font-size', 13).text('prontas');
             let off = 0;
