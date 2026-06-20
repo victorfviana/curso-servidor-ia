@@ -10,6 +10,12 @@
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script type="importmap">
+    { "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    } }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
@@ -106,6 +112,20 @@ body {
     display: block;
     width: 100%;
     height: 100%;
+}
+
+/* rótulos do slide 3D (Multiplicadores) */
+.node-label {
+    font-family: 'Inter', sans-serif; font-size: 12.5px; font-weight: 700; letter-spacing: .3px;
+    color: #fff; white-space: nowrap; pointer-events: none; user-select: none;
+    background: rgba(8, 10, 14, 0.62); padding: 2px 9px; border-radius: 7px;
+    border: 1px solid rgba(255, 144, 77, 0.35); backdrop-filter: blur(2px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6); transform: translateY(-26px); transition: opacity .25s ease;
+}
+.hub-label {
+    font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 800; letter-spacing: .4px;
+    color: #fff; white-space: nowrap; pointer-events: none; user-select: none;
+    text-shadow: 0 1px 10px rgba(0, 0, 0, 0.95), 0 0 16px rgba(255, 144, 77, .6);
 }
 
 .replay-btn {
@@ -489,9 +509,7 @@ body {
                 </div>
 
                 <!-- @MIRA:SIZE 3/10 -->
-                <div class="anim-stage" id="multiplicadores-stage">
-                    <svg id="multiplicadores-svg" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid meet"></svg>
-                </div>
+                <div class="anim-stage" id="multiplicadores-stage"></div>
 
                 <div class="border-t border-white/10 pt-1 mt-1 mb-1">
                     <p class="text-xs uppercase tracking-[3px] text-white/40 text-center mb-1" data-k="s4-flabel">5 a 10 servidores formados como multiplicadores de inovação</p>
@@ -1752,71 +1770,10 @@ body {
         }
 
         // ===== SLIDE 4, MULTIPLICADORES: hub irradia para a rede (loop interno) =====
+        // Slide dos Multiplicadores agora é 3D (Three.js): a rede é montada pelo
+        // módulo no fim da página. Aqui só acionamos o início/retomada do render.
         function animateMultiplicadores() {
-            clearInterval(window.__multFlow);
-            window.__multGen = (window.__multGen || 0) + 1;
-            const myGen = window.__multGen;
-
-            const svg = d3.select('#multiplicadores-svg');
-            svg.selectAll('*').remove();
-
-            const W = 1280, H = 720;
-            const M = getData().multiplicadores || {};
-            const cx = W / 2, cy = H / 2, R = 250;
-            const NOS = M.nos || [];
-            const sats = NOS.map((s, i) => {
-                const ang = (i / NOS.length) * Math.PI * 2 - Math.PI / 2;
-                return { label: s, x: cx + Math.cos(ang) * R, y: cy + Math.sin(ang) * R * 0.74 };
-            });
-
-            svg.append('ellipse').attr('cx', cx).attr('cy', cy).attr('rx', R).attr('ry', R * 0.74)
-                .attr('fill', 'none').attr('stroke', 'rgba(255,255,255,0.10)').attr('stroke-dasharray', '4 7');
-
-            sats.forEach((s, i) => {
-                svg.append('line').attr('x1', cx).attr('y1', cy).attr('x2', cx).attr('y2', cy)
-                    .attr('stroke', PRIMARY).attr('stroke-opacity', 0.25).attr('stroke-width', 1.5)
-                    .transition().delay(700 + i * 90).duration(500)
-                    .attr('x2', s.x).attr('y2', s.y);
-            });
-
-            const sg = svg.selectAll('g.sat').data(sats).join('g').attr('class', 'sat')
-                .attr('transform', d => `translate(${d.x},${d.y})`);
-            sg.append('circle').attr('r', 0).attr('fill', 'rgba(255,255,255,0.07)')
-                .attr('stroke', PRIMARY).attr('stroke-opacity', 0.5)
-                .transition().delay((d, i) => 800 + i * 90).duration(500).ease(d3.easeBackOut).attr('r', 38);
-            sg.append('text').attr('text-anchor', 'middle').attr('dy', 4)
-                .attr('fill', 'rgba(255,255,255,0.85)').attr('font-size', 14).attr('font-weight', 600)
-                .text(d => d.label).attr('opacity', 0)
-                .transition().delay((d, i) => 1000 + i * 90).attr('opacity', 1);
-
-            const hub = svg.append('g').attr('transform', `translate(${cx},${cy})`);
-            hub.append('circle').attr('r', 0).attr('fill', 'rgba(255,144,77,0.14)')
-                .attr('stroke', PRIMARY).attr('stroke-width', 3)
-                .transition().duration(750).ease(d3.easeBackOut).attr('r', 74);
-            hub.append('text').attr('text-anchor', 'middle').attr('dy', -6)
-                .attr('fill', PRIMARY).attr('font-size', 18).attr('font-weight', 800)
-                .text(M.hubL1 || '').attr('opacity', 0).transition().delay(400).attr('opacity', 1);
-            hub.append('text').attr('text-anchor', 'middle').attr('dy', 18)
-                .attr('fill', PRIMARY).attr('font-size', 18).attr('font-weight', 800)
-                .text(M.hubL2 || '').attr('opacity', 0).transition().delay(400).attr('opacity', 1);
-            const hubPulse = hub.append('circle').attr('r', 74).attr('fill', 'none')
-                .attr('stroke', PRIMARY).attr('opacity', 0);
-
-            function radiate() {
-                if (myGen !== window.__multGen || sats.length === 0) return;
-                sats.forEach((s, i) => {
-                    const p = svg.append('circle').attr('r', 6).attr('fill', ACCENT2)
-                        .attr('cx', cx).attr('cy', cy).attr('opacity', 0.95)
-                        .style('filter', `drop-shadow(0 0 6px ${PRIMARY})`);
-                    p.transition().delay(i * 70).duration(1100).ease(d3.easeQuadInOut)
-                        .attr('cx', s.x).attr('cy', s.y).attr('opacity', 0.15)
-                        .on('end', () => p.remove());
-                });
-                hubPulse.attr('r', 74).attr('opacity', 0.5)
-                    .transition().duration(1500).ease(d3.easeCubicOut).attr('r', 140).attr('opacity', 0);
-            }
-            window.__multFlow = setInterval(radiate, 2000);
-            setTimeout(radiate, 1600);
+            if (window.__mult3dStart) window.__mult3dStart();
         }
 
         // ===== MÓDULO 1: prompt montado em 6 etapas, destaque em cascata (loop) =====
@@ -2972,7 +2929,7 @@ body {
             const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
             const reRunModulos = debounce(animateModulos, 400);
             const reRunCausal = debounce(animateCausal, 400);
-            const reRunMult = debounce(animateMultiplicadores, 400);
+            const reRunMult = debounce(() => { if (window.__mult3dRebuild) window.__mult3dRebuild(); }, 400);
 
             function field(labelTxt, value, onInput) {
                 const wrap = document.createElement('div'); wrap.className = 'mira-field';
@@ -3166,6 +3123,127 @@ body {
                     else document.exitFullscreen();
                 }
             });
+        })();
+    </script>
+    <!-- ====== Slide dos Multiplicadores em 3D (Three.js procedural) ====== -->
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+        (function () {
+            const wrap = document.getElementById('multiplicadores-stage');
+            if (!wrap) return;
+            wrap.innerHTML = '';                       // evita duplicar canvas em cópias baixadas
+            const CP = 0xFF904D, CA = 0xFFC766;
+            const W = () => wrap.clientWidth || 800, H = () => wrap.clientHeight || 500;
+
+            const scene = new THREE.Scene(); scene.background = new THREE.Color(0x070709);
+            const camera = new THREE.PerspectiveCamera(45, W() / H(), 0.1, 100);
+            camera.position.set(0, 0.5, 5.4);
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.setSize(W(), H());
+            renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.1;
+            wrap.appendChild(renderer.domElement);
+            const pmrem = new THREE.PMREMGenerator(renderer);
+            scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+            const labelRenderer = new CSS2DRenderer(); labelRenderer.setSize(W(), H());
+            Object.assign(labelRenderer.domElement.style, { position: 'absolute', top: '0', left: '0', pointerEvents: 'none' });
+            wrap.appendChild(labelRenderer.domElement);
+
+            const composer = new EffectComposer(renderer);
+            composer.addPass(new RenderPass(scene, camera));
+            const bloom = new UnrealBloomPass(new THREE.Vector2(W(), H()), 0.6, 0.55, 0.8); composer.addPass(bloom);
+
+            scene.add(new THREE.HemisphereLight(0xcfe0ff, 0x160c06, 0.5));
+            scene.add(new THREE.AmbientLight(0xffffff, 0.18));
+            const key = new THREE.DirectionalLight(0xffffff, 1.1); key.position.set(3, 4, 5); scene.add(key);
+            const fill = new THREE.DirectionalLight(CP, 0.7); fill.position.set(-4, -1, -3); scene.add(fill);
+
+            // casca de dados (mais visível: malha mais densa + opacidade maior)
+            const shell = new THREE.Mesh(new THREE.IcosahedronGeometry(2.85, 3),
+                new THREE.MeshBasicMaterial({ color: CP, wireframe: true, transparent: true, opacity: 0.17 }));
+            scene.add(shell);
+
+            // campo de partículas
+            const pc = 280, parr = new Float32Array(pc * 3);
+            for (let i = 0; i < pc; i++) { const r = 4 + Math.random() * 5, a = Math.random() * Math.PI * 2, b = Math.acos(2 * Math.random() - 1); parr[i*3]=r*Math.sin(b)*Math.cos(a); parr[i*3+1]=r*Math.cos(b); parr[i*3+2]=r*Math.sin(b)*Math.sin(a); }
+            const pgeo = new THREE.BufferGeometry(); pgeo.setAttribute('position', new THREE.BufferAttribute(parr, 3));
+            const stars = new THREE.Points(pgeo, new THREE.PointsMaterial({ color: 0xffb380, size: 0.03, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending, depthWrite: false }));
+            scene.add(stars);
+
+            const holder = new THREE.Group(); scene.add(holder);
+            const ring = new THREE.Mesh(new THREE.TorusGeometry(2.05, 0.005, 16, 220), new THREE.MeshBasicMaterial({ color: CP, transparent: true, opacity: 0.3 }));
+            ring.rotation.x = Math.PI / 2.15; holder.add(ring);
+
+            const hub = new THREE.Mesh(new THREE.SphereGeometry(0.42, 64, 64),
+                new THREE.MeshPhysicalMaterial({ color: CP, metalness: 1, roughness: 0.22, clearcoat: 1, clearcoatRoughness: 0.18, emissive: CP, emissiveIntensity: 0.4, envMapIntensity: 1.2 }));
+            holder.add(hub);
+            const hubDiv = document.createElement('div'); hubDiv.className = 'hub-label';
+            const hubLbl = new CSS2DObject(hubDiv); hubLbl.position.set(0, 0.8, 0); hub.add(hubLbl);
+
+            const nodeMat = new THREE.MeshPhysicalMaterial({ color: 0xc8d2e0, metalness: 1, roughness: 0.25, clearcoat: 1, clearcoatRoughness: 0.2, emissive: CP, emissiveIntensity: 0.12, envMapIntensity: 1.25 });
+            const pulseGeo = new THREE.SphereGeometry(0.055, 16, 16);
+            const gold = Math.PI * (3 - Math.sqrt(5)), R = 1.95;
+            let nodes = [], lines = [];
+            const pulses = [], ORIGIN = new THREE.Vector3(), tmp = new THREE.Vector3();
+
+            function clearNet() {
+                nodes.forEach(n => holder.remove(n.node)); lines.forEach(l => holder.remove(l));
+                pulses.forEach(p => holder.remove(p.m)); nodes = []; lines = []; pulses.length = 0;
+            }
+            function build() {
+                const M = (window.getData ? window.getData() : {}).multiplicadores || {};
+                const NOS = M.nos || [];
+                hubDiv.textContent = ((M.hubL1 || '') + (M.hubL2 || '')).replace(/-/g, '') || 'Multiplicadores';
+                clearNet();
+                NOS.forEach((name, i) => {
+                    const y = 1 - (i / Math.max(1, NOS.length - 1)) * 2, rad = Math.sqrt(Math.max(0, 1 - y * y)), th = gold * i;
+                    const pos = new THREE.Vector3(Math.cos(th) * rad, y, Math.sin(th) * rad).multiplyScalar(R);
+                    const node = new THREE.Mesh(new THREE.SphereGeometry(0.17, 40, 40), nodeMat); node.position.copy(pos); holder.add(node);
+                    const div = document.createElement('div'); div.className = 'node-label'; div.textContent = name; node.add(new CSS2DObject(div));
+                    const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), pos]), new THREE.LineBasicMaterial({ color: CP, transparent: true, opacity: 0.24 }));
+                    holder.add(line); lines.push(line); nodes.push({ pos, node, div });
+                });
+            }
+            function emit() {
+                if (window.__miraPaused || !inView) return;
+                nodes.forEach((n, i) => { const m = new THREE.Mesh(pulseGeo, new THREE.MeshBasicMaterial({ color: CA, transparent: true, blending: THREE.AdditiveBlending })); holder.add(m); pulses.push({ m, to: n.pos.clone(), t: -i * 0.05 }); });
+            }
+
+            const controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true; controls.dampingFactor = 0.06; controls.enablePan = false;
+            controls.minDistance = 3.4; controls.maxDistance = 8; controls.autoRotate = true; controls.autoRotateSpeed = 1.3;
+            let resume = null;
+            controls.addEventListener('start', () => { controls.autoRotate = false; clearTimeout(resume); });
+            controls.addEventListener('end', () => { resume = setTimeout(() => controls.autoRotate = true, 2500); });
+
+            const clock = new THREE.Clock();
+            let rafId = null, inView = false;
+            function loop() {
+                if (window.__miraPaused || !inView) { rafId = null; return; }   // pausa (tecla P) e fora de tela
+                rafId = requestAnimationFrame(loop);
+                const dt = clock.getDelta();
+                shell.rotation.y += dt * 0.05; stars.rotation.y += dt * 0.012;
+                for (let i = pulses.length - 1; i >= 0; i--) { const p = pulses[i]; p.t += dt * 0.55; if (p.t < 0) continue; if (p.t >= 1) { holder.remove(p.m); p.m.material.dispose(); pulses.splice(i, 1); continue; } p.m.position.lerpVectors(ORIGIN, p.to, p.t); p.m.material.opacity = 1 - p.t * 0.5; }
+                const dHub = camera.position.distanceTo(ORIGIN);
+                for (const n of nodes) { const dN = camera.position.distanceTo(n.node.getWorldPosition(tmp)); const t = THREE.MathUtils.clamp((dHub - dN) / 1.5 + 0.5, 0, 1); n.div.style.opacity = (0.45 + 0.55 * t).toFixed(2); }
+                controls.update(); composer.render(); labelRenderer.render(scene, camera);
+            }
+            function start() { if (rafId == null && inView && !window.__miraPaused) loop(); }
+
+            new IntersectionObserver(es => es.forEach(e => { inView = e.isIntersecting; if (inView) start(); }), { threshold: 0.12 }).observe(wrap);
+            new ResizeObserver(() => { const w = W(), h = H(); if (!w || !h) return; camera.aspect = w / h; camera.updateProjectionMatrix(); renderer.setSize(w, h); composer.setSize(w, h); labelRenderer.setSize(w, h); }).observe(wrap);
+            setInterval(emit, 2400);
+
+            build();
+            window.__mult3dStart = () => { start(); emit(); };
+            window.__mult3dRebuild = () => { build(); start(); };
         })();
     </script>
 </body>
