@@ -357,6 +357,10 @@ body {
             font-size: clamp(10px, 1.4vh, 12.5px); color: rgba(255, 255, 255, 0.82);
         }
         .ig6-stat i { color: var(--mira-primary); width: 14px; height: 14px; }
+
+        /* ===== Página final Obrigado (3D) ===== */
+        .obrigado-stage { position: absolute; inset: 0; z-index: 0; }
+        .obrigado-stage canvas { display: block; }
     </style>
 <style id="mira-readonly">/* versão do aluno: sem edição */ #mira-edit-bar{display:none !important;}</style>
 </head>
@@ -1672,6 +1676,16 @@ body {
                 animation: mira-pulse 4s ease-in-out infinite;
             }
         </style>
+    </section>
+
+    <!-- ============ PÁGINA FINAL: OBRIGADO (3D) ============ -->
+    <section class="min-h-screen flex flex-col items-center justify-center relative overflow-hidden px-6">
+        <div class="obrigado-stage" id="obrigado-stage"></div>
+        <div class="relative z-10 text-center max-w-3xl">
+            <h2 class="text-7xl md:text-8xl font-black mb-6" data-k="obg-h2">Obrigado<span class="primary-color">.</span></h2>
+            <p class="text-xl md:text-2xl text-soft mb-8" data-k="obg-sub">Que a inteligência artificial fortaleça, com método e responsabilidade, a entrega da Justiça Federal no Ceará.</p>
+            <p class="text-softer text-sm tracking-widest uppercase" data-k="obg-foot">Servidor + IA · INOVAJUS · Eixo III</p>
+        </div>
     </section>
 
     <!-- Dados das animações (rótulos editáveis pelo modo de edição) -->
@@ -3136,6 +3150,9 @@ body {
             window.__a20To = setTimeout(() => { if (g === window.__a20Gen) { loop(); window.__a20Loop = setInterval(loop, 700); } }, 900);
         }
 
+        // Página final 3D: o módulo no fim do body monta a cena; aqui só (re)inicia.
+        function animateObrigado() { if (window.__obrigadoStart) window.__obrigadoStart(); }
+
         // === Sistema de gatilhos: dispara a animação ao entrar no viewport ===
         function setupAnimationTriggers() {
             const stages = [
@@ -3173,7 +3190,8 @@ body {
                 { stage: document.getElementById('a42-stage'), fn: animateA42, replay: 'replay-a42' },
                 { stage: document.getElementById('a43-stage'), fn: animateA43, replay: 'replay-a43' },
                 { stage: document.getElementById('a44-stage'), fn: animateA44, replay: 'replay-a44' },
-                { stage: document.getElementById('a45-stage'), fn: animateA45, replay: 'replay-a45' }
+                { stage: document.getElementById('a45-stage'), fn: animateA45, replay: 'replay-a45' },
+                { stage: document.getElementById('obrigado-stage'), fn: animateObrigado }
             ].filter(s => s.stage);
             window.__miraStages = stages;
 
@@ -3582,6 +3600,74 @@ body {
             build();
             window.__mult3dStart = () => { start(); emit(); };
             window.__mult3dRebuild = () => { build(); start(); };
+        })();
+    </script>
+
+    <!-- ====== Página final Obrigado em 3D (galáxia de partículas, Three.js) ====== -->
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        (function () {
+            const wrap = document.getElementById('obrigado-stage');
+            if (!wrap) return;
+            wrap.innerHTML = '';
+            const W = () => wrap.clientWidth || 800, H = () => wrap.clientHeight || 600;
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(55, W() / H(), 0.1, 100);
+            camera.position.set(0, 2.4, 6.2);
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.setSize(W(), H());
+            renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.15;
+            wrap.appendChild(renderer.domElement);
+            const composer = new EffectComposer(renderer);
+            composer.addPass(new RenderPass(scene, camera));
+            composer.addPass(new UnrealBloomPass(new THREE.Vector2(W(), H()), 0.9, 0.6, 0.72));
+
+            // galáxia espiral de partículas (tons da marca)
+            const N = 6000, pos = new Float32Array(N * 3), col = new Float32Array(N * 3);
+            const c1 = new THREE.Color(0xFFC766), c2 = new THREE.Color(0xFF904D), c3 = new THREE.Color(0x6e3310);
+            const arms = 4, sep = Math.PI * 2 / arms, Rmax = 4.3;
+            for (let i = 0; i < N; i++) {
+                const r = Math.pow(Math.random(), 0.6) * Rmax;
+                const ang = Math.floor(Math.random() * arms) * sep + r * 0.62 + (Math.random() - 0.5) * 0.5 * (1 + r * 0.08);
+                const y = (Math.random() - 0.5) * 0.55 * Math.exp(-r * 0.35);
+                pos[i*3] = Math.cos(ang) * r; pos[i*3+1] = y; pos[i*3+2] = Math.sin(ang) * r;
+                const t = r / Rmax, cc = t < 0.5 ? c1.clone().lerp(c2, t * 2) : c2.clone().lerp(c3, (t - 0.5) * 2);
+                col[i*3] = cc.r; col[i*3+1] = cc.g; col[i*3+2] = cc.b;
+            }
+            const geo = new THREE.BufferGeometry();
+            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+            const galaxy = new THREE.Points(geo, new THREE.PointsMaterial({ size: 0.035, vertexColors: true, transparent: true, opacity: 0.92, blending: THREE.AdditiveBlending, depthWrite: false }));
+            scene.add(galaxy);
+            const core = new THREE.Mesh(new THREE.SphereGeometry(0.16, 24, 24), new THREE.MeshBasicMaterial({ color: 0xFFE6C2 }));
+            scene.add(core);
+
+            const controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true; controls.dampingFactor = 0.06; controls.enablePan = false;
+            controls.minDistance = 4; controls.maxDistance = 10;
+            controls.autoRotate = true; controls.autoRotateSpeed = 0.6;
+            controls.minPolarAngle = Math.PI * 0.28; controls.maxPolarAngle = Math.PI * 0.62;
+            let resume = null;
+            controls.addEventListener('start', () => { controls.autoRotate = false; clearTimeout(resume); });
+            controls.addEventListener('end', () => { resume = setTimeout(() => controls.autoRotate = true, 2500); });
+
+            const clock = new THREE.Clock();
+            let rafId = null, inView = false;
+            function loop() {
+                if (window.__miraPaused || !inView) { rafId = null; return; }   // respeita a tecla P
+                rafId = requestAnimationFrame(loop);
+                galaxy.rotation.y += clock.getDelta() * 0.08;
+                controls.update(); composer.render();
+            }
+            function start() { if (rafId == null && inView && !window.__miraPaused) loop(); }
+            new IntersectionObserver(es => es.forEach(e => { inView = e.isIntersecting; if (inView) start(); }), { threshold: 0.12 }).observe(wrap);
+            new ResizeObserver(() => { const w = W(), h = H(); if (!w || !h) return; camera.aspect = w / h; camera.updateProjectionMatrix(); renderer.setSize(w, h); composer.setSize(w, h); }).observe(wrap);
+            window.__obrigadoStart = () => start();
         })();
     </script>
 </body>
