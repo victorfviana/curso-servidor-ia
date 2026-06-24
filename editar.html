@@ -406,14 +406,14 @@ body {
         </div>
     </section>
 
-    <!-- ============ SLIDE 2: AÇÃO 1.2, CURSO EM 4 MÓDULOS (ESCADA) ============ -->
+    <!-- ============ SLIDE 2: MAPA DO CURSO (infográfico da jornada) ============ -->
     <section class="min-h-screen flex flex-col items-center justify-center px-6 pt-3 pb-6">
         <div class="w-full max-w-6xl" data-aos="fade-up" data-aos-delay="100">
             <div class="text-center mb-2">
                 <h2 class="text-4xl md:text-5xl font-bold mb-2" data-k="s2-h2">
-                    Quatro módulos, <span class="primary-color italic">uma trilha</span>
+                    A trilha do <span class="primary-color italic">curso</span>
                 </h2>
-                <p class="text-white/60 italic text-lg md:text-xl" data-k="s2-sub">Do fundamento à governança, degrau a degrau.</p>
+                <p class="text-white/60 italic text-lg md:text-xl" data-k="s2-sub">Quatro módulos e o horizonte: dos fundamentos à autonomia responsável.</p>
             </div>
 
             <div class="glass-card rounded-2xl p-1 md:p-2" id="card-modulos">
@@ -437,26 +437,6 @@ body {
                     <svg id="modulos-svg" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid meet"></svg>
                 </div>
 
-                <div class="border-t border-white/10 pt-1 mt-1 mb-1">
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-                        <div class="attribute-pill text-center p-1 rounded-xl">
-                            <i data-lucide="cpu" class="w-4 h-4 primary-color mx-auto mb-1"></i>
-                            <p class="text-sm font-semibold tracking-wide" data-k="s2-pill1">Fundamentos, 6h</p>
-                        </div>
-                        <div class="attribute-pill text-center p-1 rounded-xl">
-                            <i data-lucide="brain" class="w-4 h-4 primary-color mx-auto mb-1"></i>
-                            <p class="text-sm font-semibold tracking-wide" data-k="s2-pill2">Pensamento causal, 6h</p>
-                        </div>
-                        <div class="attribute-pill text-center p-1 rounded-xl">
-                            <i data-lucide="scale" class="w-4 h-4 primary-color mx-auto mb-1"></i>
-                            <p class="text-sm font-semibold tracking-wide" data-k="s2-pill3">Prática forense, 10h</p>
-                        </div>
-                        <div class="attribute-pill text-center p-1 rounded-xl">
-                            <i data-lucide="shield-check" class="w-4 h-4 primary-color mx-auto mb-1"></i>
-                            <p class="text-sm font-semibold tracking-wide" data-k="s2-pill4">Ética e LGPD, 2h</p>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </section>
@@ -1697,10 +1677,11 @@ body {
     <script type="application/json" id="mira-data">
 {
   "modulos": [
-    { "n": "1", "titulo": "Fundamentos de IA", "carga": "Prompt engineering · 6h" },
-    { "n": "2", "titulo": "Pensamento causal", "carga": "Crítica e validação · 6h" },
-    { "n": "3", "titulo": "Prática forense", "carga": "Triagem, minutas, pesquisa · 10h" },
-    { "n": "4", "titulo": "Ética e governança", "carga": "Res. 615, LGPD · 2h" }
+    { "n": "1", "titulo": "Fundamentos", "carga": "6h · prompt" },
+    { "n": "2", "titulo": "Pensamento causal", "carga": "6h · crítica" },
+    { "n": "3", "titulo": "Prática forense", "carga": "10h · forense" },
+    { "n": "4", "titulo": "Ética e governança", "carga": "2h · LGPD" },
+    { "n": "5", "titulo": "Horizonte", "carga": "sistemas agênticos" }
   ],
   "causal": {
     "causaL1": "Causa", "causaL2": "real",
@@ -1797,71 +1778,66 @@ body {
 
         // ===== SLIDE 2, MÓDULOS: escada com orbe subindo (loop interno) =====
         function animateModulos() {
-            clearTimeout(window.__modulosClimb);
+            clearTimeout(window.__modulosClimb); clearInterval(window.__modulosLoop);
             window.__modulosGen = (window.__modulosGen || 0) + 1;
-            const myGen = window.__modulosGen;
-
+            const g = window.__modulosGen;
             const svg = d3.select('#modulos-svg');
             svg.selectAll('*').remove();
-
             const W = 1280, H = 720;
-            const MODULOS = getData().modulos || [];
-            const stepW = 250, gapX = 38, baseX = 150, baseY = H - 110;
-            const stepH = 118;
-
-            const steps = MODULOS.map((m, i) => ({
+            const M = getData().modulos || [];
+            const n = M.length;
+            const x0 = 160, xN = W - 160;
+            const stations = M.map((m, i) => ({
                 ...m,
-                x: baseX + i * (stepW + gapX) * 0.62,
-                y: baseY - (i + 1) * stepH,
-                w: stepW
+                x: x0 + (n > 1 ? (xN - x0) * i / (n - 1) : 0),
+                y: 470 - i * 50,
+                last: i === n - 1
             }));
-
-            svg.append('line')
-                .attr('x1', 60).attr('x2', W - 60).attr('y1', baseY).attr('y2', baseY)
-                .attr('stroke', 'rgba(255,255,255,0.10)').attr('stroke-width', 2)
-                .attr('stroke-dasharray', '5,5');
-
-            const stepG = svg.selectAll('g.step').data(steps).join('g').attr('class', 'step');
-            stepG.append('rect')
-                .attr('x', d => d.x).attr('y', baseY).attr('width', d => d.w).attr('height', 0).attr('rx', 12)
-                .attr('fill', 'rgba(255,255,255,0.06)').attr('stroke', PRIMARY).attr('stroke-opacity', 0.45)
-                .transition().delay((d, i) => 250 + i * 240).duration(650).ease(d3.easeCubicOut)
-                .attr('y', d => d.y).attr('height', d => baseY - d.y);
-
-            stepG.append('text')
-                .attr('x', d => d.x + 26).attr('y', d => d.y + 50)
-                .attr('fill', PRIMARY).attr('font-size', 40).attr('font-weight', 900)
-                .text(d => d.n).attr('opacity', 0)
-                .transition().delay((d, i) => 500 + i * 240).attr('opacity', 0.85);
-
-            stepG.append('text')
-                .attr('x', d => d.x + 64).attr('y', d => d.y + 40)
-                .attr('fill', 'rgba(255,255,255,0.92)').attr('font-size', 22).attr('font-weight', 700)
-                .text(d => d.titulo).attr('opacity', 0)
-                .transition().delay((d, i) => 600 + i * 240).attr('opacity', 1);
-
-            stepG.append('text')
-                .attr('x', d => d.x + 64).attr('y', d => d.y + 70)
-                .attr('fill', 'rgba(255,255,255,0.55)').attr('font-size', 15)
-                .text(d => d.carga).attr('opacity', 0)
-                .transition().delay((d, i) => 680 + i * 240).attr('opacity', 1);
-
-            const orb = svg.append('circle').attr('r', 16).attr('fill', PRIMARY)
-                .style('filter', `drop-shadow(0 0 14px ${PRIMARY})`).attr('opacity', 0);
-
-            function climb() {
-                if (myGen !== window.__modulosGen || steps.length === 0) return;
-                orb.interrupt()
-                    .attr('cx', steps[0].x + 30).attr('cy', baseY - 16).attr('opacity', 1);
-                let t = orb.transition().duration(400);
-                steps.forEach(s => {
-                    t = t.transition().duration(720).ease(d3.easeBackOut.overshoot(1.2))
-                        .attr('cx', s.x + s.w - 30).attr('cy', s.y - 18);
-                });
-                t.transition().delay(700).duration(450).attr('opacity', 0)
-                    .on('end', () => { window.__modulosClimb = setTimeout(climb, 300); });
+            // trilha (caminho que sobe da esquerda para a direita)
+            const lineGen = d3.line().x(d => d.x).y(d => d.y).curve(d3.curveCardinal.tension(0.75));
+            const path = svg.append('path').attr('d', lineGen(stations)).attr('fill', 'none')
+                .attr('stroke', PRIMARY).attr('stroke-opacity', 0.30).attr('stroke-width', 2.5);
+            const Lp = path.node().getTotalLength();
+            path.attr('stroke-dasharray', Lp + ' ' + Lp).attr('stroke-dashoffset', Lp)
+                .transition().duration(1100).ease(d3.easeCubicInOut).attr('stroke-dashoffset', 0)
+                .on('end', () => path.attr('stroke-dasharray', '6,9'));
+            // estações
+            const sg = svg.selectAll('g.st').data(stations).join('g').attr('class', 'st')
+                .attr('transform', d => `translate(${d.x},${d.y})`);
+            sg.append('circle').attr('class', 'nd').attr('r', 0)
+                .attr('fill', d => d.last ? 'rgba(255,144,77,0.18)' : 'rgba(255,255,255,0.06)')
+                .attr('stroke', PRIMARY).attr('stroke-width', d => d.last ? 3 : 2).attr('stroke-opacity', 0.6)
+                .transition().delay((d, i) => 250 + i * 170).duration(450).ease(d3.easeBackOut).attr('r', 42);
+            sg.append('text').attr('text-anchor', 'middle').attr('dy', 9)
+                .attr('fill', PRIMARY).attr('font-size', d => d.last ? 30 : 26).attr('font-weight', 900)
+                .text(d => d.last ? '★' : d.n).attr('opacity', 0)
+                .transition().delay((d, i) => 420 + i * 170).attr('opacity', 0.9);
+            sg.append('text').attr('text-anchor', 'middle').attr('y', -60)
+                .attr('fill', 'rgba(255,255,255,0.92)').attr('font-size', 21).attr('font-weight', 700)
+                .text(d => d.titulo).attr('opacity', 0).transition().delay((d, i) => 520 + i * 170).attr('opacity', 1);
+            sg.append('text').attr('text-anchor', 'middle').attr('y', 66)
+                .attr('fill', 'rgba(255,255,255,0.52)').attr('font-size', 14)
+                .text(d => d.carga).attr('opacity', 0).transition().delay((d, i) => 600 + i * 170).attr('opacity', 1);
+            sg.append('circle').attr('class', 'pl').attr('r', 42).attr('fill', 'none').attr('stroke', PRIMARY).attr('opacity', 0);
+            // orbe percorre a trilha, estação a estação (loop interno)
+            const orb = svg.append('circle').attr('r', 11).attr('fill', ACCENT2)
+                .style('filter', `drop-shadow(0 0 14px ${PRIMARY})`).attr('opacity', 0)
+                .attr('transform', `translate(${stations[0].x},${stations[0].y})`);
+            let k = 0;
+            function step() {
+                if (g !== window.__modulosGen || n === 0) return;
+                const s = stations[k];
+                orb.interrupt().attr('opacity', 1).transition().duration(720).ease(d3.easeQuadInOut)
+                    .attr('transform', `translate(${s.x},${s.y})`);
+                sg.selectAll('circle.nd').attr('fill', d => d.last ? 'rgba(255,144,77,0.18)' : 'rgba(255,255,255,0.06)');
+                const node = d3.select(sg.nodes()[k]);
+                node.select('circle.nd').transition().duration(260).attr('fill', 'rgba(255,144,77,0.32)');
+                node.select('circle.pl').attr('r', 42).attr('opacity', 0.5).transition().duration(850).attr('r', 78).attr('opacity', 0);
+                k = (k + 1) % n;
             }
-            window.__modulosClimb = setTimeout(climb, 1500);
+            window.__modulosClimb = setTimeout(() => {
+                if (g === window.__modulosGen) { step(); window.__modulosLoop = setInterval(step, 1050); }
+            }, 1400);
         }
 
         // ===== SLIDE 3, CAUSAL: confundidor irradia para os dois efeitos (loop interno) =====
@@ -3310,8 +3286,8 @@ body {
                 // Slide 2, módulos
                 const p2 = panel('Rótulos dos módulos (texto da animação)');
                 getData().modulos.forEach((m, i) => {
-                    p2.__grid.appendChild(field(`Módulo ${m.n}, título`, m.titulo, v => { const d = getData(); d.modulos[i].titulo = v; setData(d); reRunModulos(); }));
-                    p2.__grid.appendChild(field(`Módulo ${m.n}, detalhe e carga`, m.carga, v => { const d = getData(); d.modulos[i].carga = v; setData(d); reRunModulos(); }));
+                    p2.__grid.appendChild(field(`Estação ${i + 1}, título`, m.titulo, v => { const d = getData(); d.modulos[i].titulo = v; setData(d); reRunModulos(); }));
+                    p2.__grid.appendChild(field(`Estação ${i + 1}, detalhe e carga`, m.carga, v => { const d = getData(); d.modulos[i].carga = v; setData(d); reRunModulos(); }));
                 });
                 document.getElementById('card-modulos').appendChild(p2);
 
