@@ -361,6 +361,48 @@ body {
         /* ===== Página final Obrigado (3D) ===== */
         .obrigado-stage { position: absolute; inset: 0; z-index: 0; }
         .obrigado-stage canvas { display: block; }
+        .obg-scrim {
+            position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+            width: 95%; max-width: 1000px; height: 56%; z-index: 5; pointer-events: none;
+            background: radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.66), rgba(0,0,0,0.30) 55%, transparent 76%);
+        }
+        .obg-text { text-shadow: 0 2px 30px rgba(0,0,0,0.92), 0 0 10px rgba(0,0,0,0.7); }
+        .obg-h2 { color: #FFF4E4; }
+        .obg-sub { color: #FFE9D2; }
+        .obg-foot { color: rgba(255,228,196,0.7); }
+
+        /* ===== Infográfico de fluxo (a11 · Como a IA funciona) ===== */
+        .igf-scene { position: relative; width: min(92vw, 1000px); height: min(46vh, 430px); margin: 4px auto 0; }
+        .igf-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+        .igf-card {
+            position: absolute; top: 50%; transform: translate(-50%, -50%); width: 22%; min-width: 150px;
+            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(9px);
+            border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 14px; padding: 13px 14px; text-align: center;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45); transition: border-color .3s, box-shadow .3s;
+        }
+        .igf-card.igf-hot { border-color: rgba(255, 144, 77, 0.7); box-shadow: 0 8px 30px rgba(255, 144, 77, 0.22); }
+        .igf-core { width: 26%; background: rgba(255, 144, 77, 0.08); border-color: rgba(255, 144, 77, 0.40); }
+        .igf-step {
+            width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 8px; font-weight: 800; font-size: 13px; color: var(--mira-primary);
+            background: rgba(255, 144, 77, 0.14); border: 1px solid rgba(255, 144, 77, 0.45);
+        }
+        .igf-ic { color: var(--mira-primary); width: 22px; height: 22px; margin: 0 auto 6px; display: block; }
+        .igf-nm { font-weight: 700; font-size: clamp(13px, 1.9vh, 16px); }
+        .igf-mc { margin-top: 6px; font-size: clamp(10px, 1.4vh, 12.5px); color: rgba(255, 255, 255, 0.62); line-height: 1.32; }
+        .igf-bars { margin-top: 10px; display: flex; flex-direction: column; gap: 5px; }
+        .igf-bar { display: grid; grid-template-columns: 50px 1fr 28px; align-items: center; gap: 6px; font-size: clamp(9px, 1.25vh, 11px); color: rgba(255, 255, 255, 0.82); }
+        .igf-bar > span { text-align: right; }
+        .igf-bar > b { height: 7px; border-radius: 4px; background: var(--mira-primary); }
+        .igf-bar:nth-child(2) > b { opacity: .6; } .igf-bar:nth-child(3) > b { opacity: .45; }
+        .igf-bar > em { color: rgba(255, 255, 255, 0.5); font-style: normal; }
+        .igf-footer { display: flex; gap: 9px; flex-wrap: wrap; justify-content: center; margin-top: 16px; }
+        .igf-stat {
+            display: flex; align-items: center; gap: 6px; background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.10); border-radius: 9999px; padding: 6px 13px;
+            font-size: clamp(10px, 1.4vh, 12.5px); color: rgba(255, 255, 255, 0.82);
+        }
+        .igf-stat i { color: var(--mira-primary); width: 14px; height: 14px; }
     </style>
 </head>
 
@@ -587,36 +629,44 @@ body {
         </div>
     </section>
 
-    <!-- ============ AULA · MÓDULO 1 · 1 de 6: O que é IA ============ -->
+    <!-- ============ AULA · MÓDULO 1 · 1 de 7: Como a IA funciona (INFOGRÁFICO fluxo) ============ -->
     <section class="min-h-screen flex flex-col items-center justify-center px-6 pt-3 pb-6">
-        <div class="w-full max-w-6xl" data-aos="fade-up" data-aos-delay="100">
-            <div class="text-center mb-3">
-                <p class="text-xs uppercase tracking-[3px] text-white/40 mb-1" data-k="a11-eyebrow">Módulo 1 · Aula 1 de 7 · O que é IA</p>
-                <h2 class="text-4xl md:text-5xl font-bold mb-2" data-k="a11-h2">IA: prever a <span class="primary-color italic">próxima palavra</span></h2>
-                <p class="text-white/60 italic text-lg" data-k="a11-obj">Modelos de linguagem completam texto por probabilidade; não consultam um banco de verdades.</p>
+        <div class="w-full max-w-6xl flex flex-col items-center" data-aos="fade-up" data-aos-delay="100">
+            <div class="text-center mb-2">
+                <p class="text-xs uppercase tracking-[3px] text-white/40 mb-1" data-k="a11-eyebrow">Módulo 1 · Aula 1 de 7 · Como a IA funciona</p>
+                <h2 class="text-4xl md:text-5xl font-bold mb-2" data-k="a11-h2">Como a IA <span class="primary-color italic">funciona</span></h2>
+                <p class="text-white/60 italic text-lg" data-k="a11-obj">Ela prevê a próxima palavra por probabilidade: gera o texto mais provável, não a verdade.</p>
             </div>
-            <div class="glass-card rounded-2xl p-3 md:p-4 grid md:grid-cols-2 gap-4 items-center">
-                <div class="relative">
-                    <button id="replay-a11" class="replay-btn" type="button"><i data-lucide="rotate-cw" class="w-4 h-4"></i>Replay</button>
-                    <!-- @MIRA:SIZE 3/10 -->
-                    <div class="anim-stage mod-stage" id="a11-stage">
-                        <svg id="a11-svg" viewBox="0 0 720 560" preserveAspectRatio="xMidYMid meet"></svg>
+            <div class="igf-scene" id="a11-stage">
+                <svg id="a11-svg" class="igf-svg" viewBox="0 0 1000 440" preserveAspectRatio="xMidYMid meet"></svg>
+                <button id="replay-a11" class="replay-btn" type="button"><i data-lucide="rotate-cw" class="w-4 h-4"></i>Replay</button>
+                <div class="igf-card" style="left:16%">
+                    <div class="igf-step">1</div>
+                    <i data-lucide="pencil-line" class="igf-ic"></i>
+                    <div class="igf-nm" data-k="a11-c1">Seu texto</div>
+                    <div class="igf-mc" data-k="a11-d1">A pergunta ou o documento que você fornece.</div>
+                </div>
+                <div class="igf-card igf-core" style="left:50%">
+                    <div class="igf-step">2</div>
+                    <i data-lucide="sparkles" class="igf-ic"></i>
+                    <div class="igf-nm" data-k="a11-c2">Prevê a próxima palavra</div>
+                    <div class="igf-bars">
+                        <div class="igf-bar"><span>analisar</span><b style="width:62%"></b><em>62%</em></div>
+                        <div class="igf-bar"><span>arquivar</span><b style="width:21%"></b><em>21%</em></div>
+                        <div class="igf-bar"><span>intimar</span><b style="width:11%"></b><em>11%</em></div>
                     </div>
                 </div>
-                <div class="px-2">
-                    <p class="text-xs uppercase tracking-[3px] text-white/40 mb-3">Ideias-chave</p>
-                    <ul class="space-y-2 text-white/85">
-                        <li class="flex gap-3 mod-topic"><i data-lucide="check" class="w-5 h-5 primary-color shrink-0 mt-0.5"></i><span data-k="a11-t1">A IA generativa prevê a palavra mais provável, uma após a outra.</span></li>
-                        <li class="flex gap-3 mod-topic"><i data-lucide="check" class="w-5 h-5 primary-color shrink-0 mt-0.5"></i><span data-k="a11-t2">Ela não consulta um banco oficial: gera o texto mais plausível.</span></li>
-                        <li class="flex gap-3 mod-topic"><i data-lucide="check" class="w-5 h-5 primary-color shrink-0 mt-0.5"></i><span data-k="a11-t3">Por isso pode inventar com confiança, a chamada alucinação.</span></li>
-                        <li class="flex gap-3 mod-topic"><i data-lucide="check" class="w-5 h-5 primary-color shrink-0 mt-0.5"></i><span data-k="a11-t4">Plausível não é o mesmo que verdadeiro: a conferência é humana.</span></li>
-                    </ul>
-                    <div class="grid grid-cols-3 gap-2 mt-4">
-                        <div class="attribute-pill text-center p-2 rounded-xl"><i data-lucide="sparkles" class="w-4 h-4 primary-color mx-auto mb-1"></i><p class="text-xs font-semibold" data-k="a11-pill1">Prevê, não consulta</p></div>
-                        <div class="attribute-pill text-center p-2 rounded-xl"><i data-lucide="triangle-alert" class="w-4 h-4 primary-color mx-auto mb-1"></i><p class="text-xs font-semibold" data-k="a11-pill2">Plausível ≠ verdadeiro</p></div>
-                        <div class="attribute-pill text-center p-2 rounded-xl"><i data-lucide="user-check" class="w-4 h-4 primary-color mx-auto mb-1"></i><p class="text-xs font-semibold" data-k="a11-pill3">Conferir sempre</p></div>
-                    </div>
+                <div class="igf-card" style="left:84%">
+                    <div class="igf-step">3</div>
+                    <i data-lucide="file-text" class="igf-ic"></i>
+                    <div class="igf-nm" data-k="a11-c3">Texto plausível</div>
+                    <div class="igf-mc" data-k="a11-d3">Pode soar certo e errar: confira sempre.</div>
                 </div>
+            </div>
+            <div class="igf-footer">
+                <div class="igf-stat"><i data-lucide="database"></i><span data-k="a11-s1">Não consulta um banco oficial</span></div>
+                <div class="igf-stat"><i data-lucide="triangle-alert"></i><span data-k="a11-s2">Plausível não é o mesmo que verdadeiro</span></div>
+                <div class="igf-stat"><i data-lucide="user-check"></i><span data-k="a11-s3">A conferência é humana</span></div>
             </div>
         </div>
     </section>
@@ -1680,10 +1730,11 @@ body {
     <!-- ============ PÁGINA FINAL: OBRIGADO (3D) ============ -->
     <section class="min-h-screen flex flex-col items-center justify-center relative overflow-hidden px-6">
         <div class="obrigado-stage" id="obrigado-stage"></div>
-        <div class="relative z-10 text-center max-w-3xl">
-            <h2 class="text-7xl md:text-8xl font-black mb-6" data-k="obg-h2">Obrigado<span class="primary-color">.</span></h2>
-            <p class="text-xl md:text-2xl text-soft mb-8" data-k="obg-sub">Que a inteligência artificial fortaleça, com método e responsabilidade, a entrega da Justiça Federal no Ceará.</p>
-            <p class="text-softer text-sm tracking-widest uppercase" data-k="obg-foot">Servidor + IA · INOVAJUS · Eixo III</p>
+        <div class="obg-scrim"></div>
+        <div class="relative z-10 text-center max-w-3xl obg-text">
+            <h2 class="text-7xl md:text-8xl font-black mb-6 obg-h2" data-k="obg-h2">Obrigado<span class="primary-color">.</span></h2>
+            <p class="text-xl md:text-2xl mb-8 obg-sub" data-k="obg-sub">Que a inteligência artificial fortaleça, com método e responsabilidade, a entrega da Justiça Federal no Ceará.</p>
+            <p class="text-sm tracking-widest uppercase obg-foot" data-k="obg-foot">Servidor + IA · INOVAJUS · Eixo III</p>
         </div>
     </section>
 
@@ -1993,73 +2044,30 @@ body {
 
         // ===== AULA M1.1: IA prevê a próxima palavra por probabilidade (loop) =====
         function animateA11() {
-            clearTimeout(window.__a11To); clearInterval(window.__a11Loop);
+            clearInterval(window.__a11Loop); clearTimeout(window.__a11To);
             window.__a11Gen = (window.__a11Gen || 0) + 1; const g = window.__a11Gen;
             const svg = d3.select('#a11-svg'); svg.selectAll('*').remove();
-            const W = 720, H = 560;
-            const base = 'O servidor deve';
-            const steps = [
-                { cands: [['analisar', 62], ['arquivar', 21], ['intimar', 11]] },
-                { cands: [['o', 55], ['os', 30], ['cada', 10]] },
-                { cands: [['processo', 70], ['pedido', 18], ['caso', 8]] },
-                { cands: [['com', 50], ['e', 28], ['até', 15]] },
-                { cands: [['atenção', 60], ['urgência', 25], ['cautela', 12]] }
-            ];
-            svg.append('text').attr('x', W / 2).attr('y', 58).attr('text-anchor', 'middle')
-                .attr('fill', 'rgba(255,255,255,0.45)').attr('font-size', 15).attr('font-style', 'italic')
-                .text('a IA escolhe a próxima palavra mais provável');
-            const sentY = 118;
-            const sent = svg.append('text').attr('x', W / 2).attr('y', sentY).attr('text-anchor', 'middle')
-                .attr('fill', 'rgba(255,255,255,0.92)').attr('font-size', 25).attr('font-weight', 600);
-            const chipY = 215, chipH = 70, chipW = 320, chipX = (W - chipW) / 2, gap = 20;
-            const cg = svg.append('g');
-            let words = [base], si = 0;
-            const renderSent = () => sent.text(words.join(' '));
-            renderSent();
-            function showStep() {
+            const cy = 220, xs = [160, 500, 840];
+            const defs = svg.append('defs');
+            defs.append('marker').attr('id', 'a11arr').attr('viewBox', '0 0 10 10').attr('refX', 8).attr('refY', 5)
+                .attr('markerWidth', 7).attr('markerHeight', 7).attr('orient', 'auto-start-reverse')
+                .append('path').attr('d', 'M0 0 L10 5 L0 10 z').attr('fill', PRIMARY);
+            [[270, 392], [608, 730]].forEach(([x1, x2]) => {
+                svg.append('line').attr('x1', x1).attr('y1', cy).attr('x2', x2).attr('y2', cy)
+                    .attr('stroke', PRIMARY).attr('stroke-opacity', 0.4).attr('stroke-width', 2).attr('marker-end', 'url(#a11arr)');
+            });
+            const cards = Array.from(document.querySelectorAll('#a11-stage .igf-card'));
+            const orb = svg.append('circle').attr('r', 6).attr('fill', ACCENT2).attr('cy', cy).attr('cx', xs[0])
+                .attr('opacity', 0).style('filter', `drop-shadow(0 0 6px ${PRIMARY})`);
+            let k = 0;
+            function step() {
                 if (g !== window.__a11Gen) return;
-                cg.selectAll('*').remove();
-                const cands = steps[si].cands;
-                const rows = cg.selectAll('g.cand').data(cands).join('g').attr('class', 'cand')
-                    .attr('transform', (d, i) => `translate(${chipX},${chipY + i * (chipH + gap)})`);
-                rows.append('rect').attr('width', chipW).attr('height', chipH).attr('rx', 12)
-                    .attr('fill', 'rgba(255,255,255,0.05)').attr('stroke', PRIMARY).attr('stroke-opacity', (d, i) => i === 0 ? 0.9 : 0.3)
-                    .attr('opacity', 0).attr('transform', 'translate(0,12)')
-                    .transition().delay((d, i) => i * 120).duration(380).ease(d3.easeBackOut).attr('opacity', 1).attr('transform', 'translate(0,0)');
-                rows.append('text').attr('x', 20).attr('y', chipH / 2 + 6).attr('fill', 'rgba(255,255,255,0.92)')
-                    .attr('font-size', 20).attr('font-weight', (d, i) => i === 0 ? 700 : 500).text(d => d[0])
-                    .attr('opacity', 0).transition().delay((d, i) => i * 120 + 120).attr('opacity', 1);
-                rows.append('rect').attr('x', 160).attr('y', chipH / 2 - 6).attr('height', 12).attr('rx', 6).attr('width', 0)
-                    .attr('fill', PRIMARY).attr('opacity', (d, i) => i === 0 ? 0.9 : 0.4)
-                    .transition().delay((d, i) => i * 120 + 160).duration(520).attr('width', d => d[1] / 100 * 110);
-                rows.append('text').attr('x', chipW - 16).attr('y', chipH / 2 + 5).attr('text-anchor', 'end')
-                    .attr('fill', 'rgba(255,255,255,0.55)').attr('font-size', 13).text(d => d[1] + '%')
-                    .attr('opacity', 0).transition().delay((d, i) => i * 120 + 320).attr('opacity', 1);
-                window.__a11To = setTimeout(() => {
-                    if (g !== window.__a11Gen) return;
-                    d3.select(rows.nodes()[0]).select('rect').transition().duration(300).attr('fill', 'rgba(255,144,77,0.22)').attr('stroke-opacity', 1);
-                    const p = svg.append('circle').attr('r', 6).attr('fill', ACCENT2).attr('cx', chipX + chipW / 2).attr('cy', chipY)
-                        .style('filter', `drop-shadow(0 0 6px ${PRIMARY})`).attr('opacity', 0.95);
-                    p.transition().duration(600).ease(d3.easeQuadInOut).attr('cx', W / 2).attr('cy', sentY).attr('opacity', 0.1).on('end', () => p.remove());
-                    window.__a11To = setTimeout(() => {
-                        if (g !== window.__a11Gen) return;
-                        words.push(cands[0][0]); renderSent();
-                        sent.attr('opacity', 0.6).transition().duration(250).attr('opacity', 1);
-                        si++;
-                        if (si >= steps.length) {
-                            window.__a11To = setTimeout(() => {
-                                if (g !== window.__a11Gen) return;
-                                cg.selectAll('*').remove();
-                                sent.transition().duration(450).attr('opacity', 0).on('end', () => {
-                                    if (g !== window.__a11Gen) return;
-                                    words = [base]; si = 0; renderSent(); sent.attr('opacity', 1); showStep();
-                                });
-                            }, 1500);
-                        } else { window.__a11To = setTimeout(showStep, 520); }
-                    }, 650);
-                }, 1100);
+                orb.interrupt().attr('opacity', 1).transition().duration(700).ease(d3.easeQuadInOut).attr('cx', xs[k]);
+                cards.forEach(c => c.classList.remove('igf-hot'));
+                if (cards[k]) cards[k].classList.add('igf-hot');
+                k = (k + 1) % xs.length;
             }
-            window.__a11To = setTimeout(showStep, 800);
+            window.__a11To = setTimeout(() => { if (g === window.__a11Gen) { step(); window.__a11Loop = setInterval(step, 1100); } }, 400);
         }
 
         // ===== AULA M1.2: faz bem x cuidado, holofote percorre as linhas (loop) =====
@@ -3236,7 +3244,7 @@ body {
                     if (typeof window[k] === 'number') { clearInterval(window[k]); clearTimeout(window[k]); }
                 });
                 // Congela as transições D3 em curso (deixa o desenho parado onde está)
-                if (window.d3) d3.selectAll('.anim-stage svg *, #capa-stage svg *, #a13-svg *').interrupt();
+                if (window.d3) d3.selectAll('.anim-stage svg *, #capa-stage svg *, #a13-svg *, #a11-svg *').interrupt();
                 if (window.__capaTimer) window.__capaTimer.stop();
             }
             function resumeNow() {
